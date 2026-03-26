@@ -12,16 +12,17 @@ namespace ASimpleMinecraftUpdatesBot.Services
 
     public class ConfigService
     {
-        static JsonService? jsonService;
+        readonly JsonService? jsonService;
 
         public ConfigService(JsonService service)
         {
-            jsonService = service;
+            jsonService = service ?? throw new ArgumentNullException(nameof(service));
         }
 
-        public static void UpdateConfig(string? name = "", string? ip = null, ushort? port = null, ulong? channelId = null)
+        public void UpdateConfig(string? name = "", string? ip = null, ushort? port = null, ulong? channelId = null)
         {
-            var currentConfig = jsonService!.Config;
+            Console.WriteLine("Updating Config with new values");
+            var currentConfig = jsonService.Config;
             if (!string.IsNullOrEmpty(name)) currentConfig.ServerName = name;
             if (!string.IsNullOrEmpty(ip)) currentConfig.MinecraftIp = ip;
             if (port.HasValue) currentConfig.Port = port.Value;
@@ -30,9 +31,9 @@ namespace ASimpleMinecraftUpdatesBot.Services
             jsonService.SaveConfig(currentConfig);
         }
 
-        public static void SaveToFile()
+        public void SaveToFile()
         {
-            jsonService!.SaveTextToFile();
+            jsonService.SaveTextToFile();
         }
 
 

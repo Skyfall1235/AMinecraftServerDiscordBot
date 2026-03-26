@@ -8,12 +8,14 @@ namespace ASimpleMinecraftUpdatesBot.Modules
     {
         private readonly JsonService _jsonService;
         private readonly MinecraftService _mcService;
+        private readonly ConfigService _configService;
 
 
-        public MinecraftModule(JsonService jsonService, MinecraftService mcService)
+        public MinecraftModule(JsonService jsonService, MinecraftService mcService, ConfigService configService)
         {
             _jsonService = jsonService;
             _mcService = mcService;
+            _configService = configService;
         }
 
         [SlashCommand("status", "Get the current status of the Minecraft server.")]
@@ -39,20 +41,25 @@ namespace ASimpleMinecraftUpdatesBot.Modules
             [Summary("port", "The port (default is 25565)")] ushort port = 25565,
             [Summary("channel", "The channel for updates")] SocketTextChannel? channel = null)
         {
-            await DeferAsync(ephemeral: true); // 'ephemeral' means only the admin sees this
-
+            await DeferAsync(ephemeral: true);
             try
             {
-                // 1. Use your ConfigService to update the JSON
-                // We pass the channel ID if they provided a channel
-                ConfigService.UpdateConfig(serverName, ip, port, channel?.Id);
-
+                _configService.UpdateConfig(serverName, ip, port, channel?.Id);
                 await FollowupAsync($"✅ **Settings Saved!**\nIP: `{ip}`\nPort: `{port}`\nChannel: {channel?.Mention ?? "None"}");
             }
             catch (Exception ex)
             {
                 await FollowupAsync($"❌ **Error saving config:** {ex.Message}");
             }
+        }
+
+        [SlashCommand("pinghost", "Check if the physical server is reachable.")]
+        public async Task PingHostAsync()
+        {
+            await DeferAsync();
+            //ping the ip associated with it
+            bool isAlive = await _mcService.PingComputerAsync(_jsonService.Config.MinecraftIp);
+            await FollowupAsync(isAlive ? "🖥️ Host is reachable!" : "💀 Host is unreachable (Offline or Firewall blocking).");
         }
     }
 }
