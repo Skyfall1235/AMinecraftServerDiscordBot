@@ -1,4 +1,4 @@
-# A Simple Minecraft Updates Bot
+# A Simple Minecraft Status Discord Bot
 The name is a bit long, but the premise is simple.
 A robust, containerized Discord bot built with **.NET 8** and **C#** to monitor Minecraft server status and host availability. Designed for home-lab deployment on Docker or in my case, on **CasaOS** in a homelab environment.
 
