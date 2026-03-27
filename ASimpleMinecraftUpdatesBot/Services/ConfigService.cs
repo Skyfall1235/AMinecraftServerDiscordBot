@@ -1,6 +1,4 @@
-﻿using System.Text.Json;
-
-namespace ASimpleMinecraftUpdatesBot.Services
+﻿namespace ASimpleMinecraftUpdatesBot.Services
 {
     public class BotConfig
     {
@@ -22,7 +20,7 @@ namespace ASimpleMinecraftUpdatesBot.Services
         public void UpdateConfig(string? name = "", string? ip = null, ushort? port = null, ulong? channelId = null)
         {
             Console.WriteLine("Updating Config with new values");
-            var currentConfig = jsonService.Config;
+            var currentConfig = jsonService!.Config;
             if (!string.IsNullOrEmpty(name)) currentConfig.ServerName = name;
             if (!string.IsNullOrEmpty(ip)) currentConfig.MinecraftIp = ip;
             if (port.HasValue) currentConfig.Port = port.Value;
@@ -33,36 +31,7 @@ namespace ASimpleMinecraftUpdatesBot.Services
 
         public void SaveToFile()
         {
-            jsonService.SaveTextToFile();
+            jsonService?.SaveTextToFile();
         }
-
-
-    }
-
-    public class JsonService
-    {
-        private readonly string _path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "data", "config.json");
-        public BotConfig Config { get; private set; }
-
-        public JsonService()
-        {
-            if (!Directory.Exists("data")) Directory.CreateDirectory("data");
-            Config = Load();
-        }
-
-        public BotConfig Load()
-        {
-            if (!File.Exists(_path)) return new BotConfig();
-            var json = File.ReadAllText(_path);
-            return JsonSerializer.Deserialize<BotConfig>(json) ?? new BotConfig();
-        }
-
-        public void SaveConfig(BotConfig newConfig)
-        {
-            Config = newConfig;
-            SaveTextToFile();
-        }
-
-        public void SaveTextToFile() => File.WriteAllText(_path, JsonSerializer.Serialize(Config, new JsonSerializerOptions { WriteIndented = true }));
     }
 }
